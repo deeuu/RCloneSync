@@ -466,7 +466,7 @@ if __name__ == '__main__':
 
     try:
         clouds = subprocess.check_output(['rclone', 'listremotes'])
-    except subprocess.CalledProcessError, e:
+    except subprocess.CalledProcessError as e:
         logging.error ("ERROR  Can't get list of known remotes.  Have you run rclone config?"); exit()
     except:
         logging.error ("ERROR  rclone not installed?\nError message: {}\n".format(sys.exc_info()[1])); exit()
