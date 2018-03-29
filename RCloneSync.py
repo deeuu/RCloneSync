@@ -7,6 +7,8 @@
 #   Configure rclone, including authentication before using this tool.  rclone must be in the search path.
 #
 #  Chris Nelson, November 2017 - 2018
+#  Revision and contributions:
+#  Hildo G. Jr.
 #
 #  See README.md for revision history
 #
@@ -15,14 +17,14 @@
 #
 #==========================================================
 
-import argparse
+import argparse # Deal with the input arguments.
 import sys
-import re
+import re # To deal with the `rclone` time stamp.
 import os.path, subprocess
 from datetime import datetime
 import time
-import shlex
-import logging
+#import shlex # Not used anymore, so free the memory.
+import logging # For terminal process messages.
 import inspect                                      # for getting the line number for error messages
 import collections                                  # dictionary sorting 
 
@@ -32,7 +34,7 @@ localWD = os.path.expanduser("~/.RCloneSyncWD/")    # File lists for the local a
 if not os.path.exists(localWD):
     os.makedirs(localWD)
 
-maxDelta = 50                                       # % deleted allowed, else abort.  Use --Force to override.
+MAX_DELETE = 50                                       # % deleted allowed, else abort.  Use --Force to override.
 
 
 logging.basicConfig(format='%(asctime)s/:  %(message)s')   # /%(levelname)s/%(module)s/%(funcName)s
@@ -272,15 +274,15 @@ def bidirSync():
 
     # ***** Check for too many deleted files - possible error condition and don't want to start deleting on the other side !!!
     tooManyLocalDeletes = False
-    if not force and float(localDeleted)/len(localPrior) > float(maxDelta)/100:
+    if not force and float(localDeleted)/len(localPrior) > float(MAX_DELETE)/100:
         logging.error ("Excessive number of deletes (>{}%, {} of {}) found on the Local system {} - Aborting.  Run with --Force if desired."
-                       .format (maxDelta, localDeleted, len(localPrior), localPathBase))
+                       .format (MAX_DELETE, localDeleted, len(localPrior), localPathBase))
         tooManyLocalDeletes = True
 
     tooManyRemoteDeletes = False    # Local error message placed here so that it is at the end of the listed changes for both
-    if not force and float(remoteDeleted)/len(remotePrior) > float(maxDelta)/100:
+    if not force and float(remoteDeleted)/len(remotePrior) > float(MAX_DELETE)/100:
         logging.error ("Excessive number of deletes (>{}%, {} of {}) found on the Remote system {} - Aborting.  Run with --Force if desired."
-                       .format (maxDelta, remoteDeleted, len(remotePrior), remotePathBase))
+                       .format (MAX_DELETE, remoteDeleted, len(remotePrior), remotePathBase))
         tooManyRemoteDeletes = True
 
     if tooManyLocalDeletes or tooManyRemoteDeletes: return RTN_ABORT
@@ -460,6 +462,7 @@ def releaseLock (caller):
         
 
 
+########### Call point.
 if __name__ == '__main__':
 
     logging.warning ("***** BiDirectional Sync for Cloud Services using RClone *****")
@@ -470,14 +473,14 @@ if __name__ == '__main__':
         logging.error ("ERROR  Can't get list of known remotes.  Have you run rclone config?"); exit()
     except:
         logging.error ("ERROR  rclone not installed?\nError message: {}\n".format(sys.exc_info()[1])); exit()
-    clouds = clouds.split()
+    clouds = [c.decode('utf-8') for c in clouds.split()] # Py3 create a byte array instead a string list.
 
     parser = argparse.ArgumentParser(description="***** BiDirectional Sync for Cloud Services using RClone *****")
     parser.add_argument('Cloud',            help="Name of remote cloud service ({}) plus optional path".format(clouds))
     parser.add_argument('LocalPath',        help="Path to local tree base", default=None)
     parser.add_argument('--FirstSync',      help="First run setup.  WARNING: Local files may overwrite Remote versions.  Also asserts --Verbose.", action='store_true')
     parser.add_argument('--CheckAccess',    help="Ensure expected RCLONE_TEST files are found on both Local and Remote filesystems, else abort.", action='store_true')
-    parser.add_argument('--Force',          help="Bypass maxDelta ({}%%) safety check and run the sync.  Also asserts --Verbose.".format(maxDelta), action='store_true')
+    parser.add_argument('--Force', '-f',          help="Bypass MAX_DELETE ({}%%) safety check and run the sync.  Also asserts --Verbose.".format(MAX_DELETE), action='store_true')
     parser.add_argument('--ExcludeListFile',help="File containing rclone file/path exclusions (Needed for Dropbox)", default=None)
     parser.add_argument('--Verbose',        help="Enable event logging with per-file details", action='store_true')
     parser.add_argument('--rcVerbose',      help="Enable rclone's verbosity levels (May be specified more than once for more details.  Also asserts --Verbose.)", action='count')
