@@ -177,6 +177,8 @@ Local size | File size is different (same timestamp) | Not sure if `rclone sync`
 
 ## Revision history
 
+- ??????  Added Python 3 support.
+
 - 180314  Incorporated rework by croadfeldt, changing handling of subprocess commands and many src/dest, etc. from strings 
 		to lists.  No functional or interface changes.  Added --DryRun oddity note to the README.
 
