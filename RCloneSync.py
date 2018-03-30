@@ -29,19 +29,19 @@ import inspect                                      # for getting the line numbe
 import collections                                  # dictionary sorting 
 
 
-# Configurations
-localWD = os.path.expanduser("~/.RCloneSyncWD/")    # File lists for the local and remote trees as of last sync, etc.
-if not os.path.exists(localWD):
-    os.makedirs(localWD)
+# Configurations.
+LOCAL_WD = os.path.expanduser("~/.RCloneSyncWD/")    # File lists for the local and remote trees as of last sync, etc.
+if not os.path.exists(LOCAL_WD):
+    os.makedirs(LOCAL_WD)
 
-MAX_DELETE = 50                                       # % deleted allowed, else abort.  Use --Force to override.
+MAX_DELETE = 50 # Deleted allowed, else abort.  Use --Force to override.
 
 
 logging.basicConfig(format='%(asctime)s/:  %(message)s')   # /%(levelname)s/%(module)s/%(funcName)s
 
-localListFile = remoteListFile = ""                 # On critical error, these files are deleted, requiring a --FirstSync to recover.
-RTN_ABORT = 1                                       # Tokens for return codes based on criticality.
-RTN_CRITICAL = 2                                    # Aborts allow rerunning.  Criticals block further runs.  See Readme.md.
+localListFile = remoteListFile = "" # On critical error, these files are deleted, requiring a --FirstSync to recover.
+RTN_ABORT = 1 # Tokens for return codes based on criticality.
+RTN_CRITICAL = 2 # Aborts allow rerunning.  Criticals block further runs. See Readme.md.
 
 
 def bidirSync():
@@ -60,7 +60,7 @@ def bidirSync():
         excludes.append("--exclude-from")
         excludes.append(exclusions)
 
-    listFileBase  = localWD + remotePathBase.replace(':','_').replace(r'/','_')    # '/home/<user>/.RCloneSyncWD/Remote__some_path_' or '/home/<user>/.RCloneSyncWD/Remote_'
+    listFileBase  = LOCAL_WD + remotePathBase.replace(':','_').replace(r'/','_')    # '/home/<user>/.RCloneSyncWD/Remote__some_path_' or '/home/<user>/.RCloneSyncWD/Remote_'
 
     localListFile  = listFileBase + '_llocalLSL'    # '/home/<user>/.RCloneSyncWD/Remote__some_path_llocalLSL'  (extra 'l' to make the dir list pretty)
     remoteListFile = listFileBase + '_remoteLSL'    # '/home/<user>/.RCloneSyncWD/Remote__some_path_remoteLSL'
@@ -403,7 +403,7 @@ def bidirSync():
 
 
 
-lineFormat = re.compile('\s*([0-9]+) ([\d\-]+) ([\d:]+).([\d]+) (.*)')
+LINE_FORMAT = re.compile('\s*([0-9]+) ([\d\-]+) ([\d:]+).([\d]+) (.*)')
 
 def loadList (infile):
     # Format ex:
@@ -415,7 +415,7 @@ def loadList (infile):
     try:
         with open(infile, 'r') as f:
             for line in f:
-                out = lineFormat.match(line)
+                out = LINE_FORMAT.match(line)
                 if out:
                     size = out.group(1)
                     date = out.group(2)
@@ -433,16 +433,16 @@ def loadList (infile):
         return 1, ""                                                # return False
 
 
-lockfile = "/tmp/RCloneSync_LOCK"
+LOCK_FILE = "/tmp/RCloneSync_LOCK"
 def requestLock (caller):
     for xx in range(5):
-        if os.path.exists(lockfile):
-            with open(lockfile) as fd:
+        if os.path.exists(LOCK_FILE):
+            with open(LOCK_FILE) as fd:
                 lockedBy = fd.read()
                 logging.debug ("{}.  Waiting a sec.".format(lockedBy[:-1]))   # remove the \n
             time.sleep (1)
         else:  
-            with open(lockfile, 'w') as fd:
+            with open(LOCK_FILE, 'w') as fd:
                 fd.write("Locked by {} at {}\n".format(caller, time.asctime(time.localtime())))
                 logging.debug ("LOCKed by {} at {}.".format(caller, time.asctime(time.localtime())))
             return 0
@@ -450,16 +450,16 @@ def requestLock (caller):
     return -1
 
 def releaseLock (caller):
-    if os.path.exists(lockfile):
-        with open(lockfile) as fd:
+    if os.path.exists(LOCK_FILE):
+        with open(LOCK_FILE) as fd:
             lockedBy = fd.read()
             logging.debug ("Removed lock file:  {}.".format(lockedBy))
-        os.remove(lockfile)
+        os.remove(LOCK_FILE)
         return 0
     else:
         logging.warning ("<{}> attempted to remove /tmp/LOCK but the file does not exist.".format(caller))
         return -1
-        
+
 
 
 ########### Call point.
@@ -478,23 +478,22 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="***** BiDirectional Sync for Cloud Services using RClone *****")
     parser.add_argument('Cloud',            help="Name of remote cloud service ({}) plus optional path".format(clouds))
     parser.add_argument('LocalPath',        help="Path to local tree base", default=None)
-    parser.add_argument('--FirstSync',      help="First run setup.  WARNING: Local files may overwrite Remote versions.  Also asserts --Verbose.", action='store_true')
-    parser.add_argument('--CheckAccess',    help="Ensure expected RCLONE_TEST files are found on both Local and Remote filesystems, else abort.", action='store_true')
-    parser.add_argument('--Force', '-f',          help="Bypass MAX_DELETE ({}%%) safety check and run the sync.  Also asserts --Verbose.".format(MAX_DELETE), action='store_true')
-    parser.add_argument('--ExcludeListFile',help="File containing rclone file/path exclusions (Needed for Dropbox)", default=None)
-    parser.add_argument('--Verbose',        help="Enable event logging with per-file details", action='store_true')
-    parser.add_argument('--rcVerbose',      help="Enable rclone's verbosity levels (May be specified more than once for more details.  Also asserts --Verbose.)", action='count')
-    parser.add_argument('--DryRun',         help="Go thru the motions - No files are copied/deleted.  Also asserts --Verbose.", action='store_true')
+    parser.add_argument('--first_sync',      help="First run setup.  WARNING: Local files may overwrite Remote versions.  Also asserts --verbose.", action='store_true')
+    parser.add_argument('--check_access',    help="Ensure expected RCLONE_TEST files are found on both Local and Remote filesystems, else abort.", action='store_true')
+    parser.add_argument('--force', '-f',          help="Bypass MAX_DELETE ({}%%) safety check and run the sync.  Also asserts --verbose.".format(MAX_DELETE), action='store_true')
+    parser.add_argument('--exclude_list_file',help="File containing rclone file/path exclusions (Needed for Dropbox)", default=None)
+    parser.add_argument('--verbose', '-v',        help="Enable event logging with per-file details", action='store_true')
+    parser.add_argument('--rc_verbose',      help="Enable rclone's verbosity levels (May be specified more than once for more details.  Also asserts --Verbose.)", action='count')
+    parser.add_argument('--dry_run',         help="Go thru the motions - No files are copied/deleted.  Also asserts --Verbose.", action='store_true')
     args = parser.parse_args()
 
-    firstSync    = args.FirstSync
-    checkAccess  = args.CheckAccess
-    verbose      = args.Verbose
-    rcVerbose    = args.rcVerbose
-    if rcVerbose == None: rcVerbose = 0
-    exclusions   = args.ExcludeListFile
-    dryRun       = args.DryRun
-    force        = args.Force
+    firstSync    = args.first_sync
+    checkAccess  = args.check_access
+    verbose      = args.verbose
+    rcVerbose    = (args.rc_verbose if args.rc_verbose else 0)
+    exclusions   = args.exclude_list_file
+    dryRun       = args.dry_un
+    force        = args.force
 
     remoteFormat = re.compile('([\w-]+):(.*)')              # Handle variations in the Cloud argument -- Remote: or Remote:some/path or Remote:/some/path
     out = remoteFormat.match(args.Cloud)
