@@ -478,13 +478,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="***** BiDirectional Sync for Cloud Services using RClone *****")
     parser.add_argument('Cloud',            help="Name of remote cloud service ({}) plus optional path".format(clouds))
     parser.add_argument('LocalPath',        help="Path to local tree base", default=None)
-    parser.add_argument('--first_sync',      help="First run setup.  WARNING: Local files may overwrite Remote versions.  Also asserts --verbose.", action='store_true')
-    parser.add_argument('--check_access',    help="Ensure expected RCLONE_TEST files are found on both Local and Remote filesystems, else abort.", action='store_true')
+    parser.add_argument('--first-sync',      help="First run setup.  WARNING: Local files may overwrite Remote versions.  Also asserts --verbose.", action='store_true')
+    parser.add_argument('--check-access',    help="Ensure expected RCLONE_TEST files are found on both Local and Remote filesystems, else abort.", action='store_true')
     parser.add_argument('--force', '-f',          help="Bypass MAX_DELETE ({}%%) safety check and run the sync.  Also asserts --verbose.".format(MAX_DELETE), action='store_true')
-    parser.add_argument('--exclude_list_file',help="File containing rclone file/path exclusions (Needed for Dropbox)", default=None)
+    parser.add_argument('--exclude-list-file',help="File containing rclone file/path exclusions (Needed for Dropbox)", default=None)
     parser.add_argument('--verbose', '-v',        help="Enable event logging with per-file details", action='store_true')
-    parser.add_argument('--rc_verbose',      help="Enable rclone's verbosity levels (May be specified more than once for more details.  Also asserts --Verbose.)", action='count')
-    parser.add_argument('--dry_run',         help="Go thru the motions - No files are copied/deleted.  Also asserts --Verbose.", action='store_true')
+    parser.add_argument('--rc-verbose',      help="Enable rclone's verbosity levels (May be specified more than once for more details.  Also asserts --Verbose.)", action='count')
+    parser.add_argument('--dry-run',         help="Go thru the motions - No files are copied/deleted.  Also asserts --Verbose.", action='store_true')
     args = parser.parse_args()
 
     firstSync    = args.first_sync
@@ -492,7 +492,7 @@ if __name__ == '__main__':
     verbose      = args.verbose
     rcVerbose    = (args.rc_verbose if args.rc_verbose else 0)
     exclusions   = args.exclude_list_file
-    dryRun       = args.dry_un
+    dryRun       = args.dry_run
     force        = args.force
 
     remoteFormat = re.compile('([\w-]+):(.*)')              # Handle variations in the Cloud argument -- Remote: or Remote:some/path or Remote:/some/path
