@@ -39,7 +39,7 @@ MAX_DELETE = 50 # Deleted allowed, else abort.  Use --Force to override.
 
 logging.basicConfig(format='%(asctime)s/:  %(message)s')   # /%(levelname)s/%(module)s/%(funcName)s
 
-localListFile = remoteListFile = "" # On critical error, these files are deleted, requiring a --FirstSync to recover.
+localListFile = remoteListFile = "" # On critical error, these files are deleted, requiring a --first-sync to recover.
 RTN_ABORT = 1 # Tokens for return codes based on criticality.
 RTN_CRITICAL = 2 # Aborts allow rerunning.  Criticals block further runs. See Readme.md.
 
@@ -103,9 +103,9 @@ def bidirSync():
 
 
 
-    # ***** FIRSTSYNC generate local and remote file lists, and copy any unique Remote files to Local ***** 
-    if firstSync:
-        logging.info (">>>>> Generating --FirstSync Local and Remote lists")
+    # ***** first-sync generate local and remote file lists, and copy any unique Remote files to Local ***** 
+    if first-sync:
+        logging.info (">>>>> Generating --first-sync Local and Remote lists")
         if rcloneLSL (localPathBase, localListFile, excludes, linenum=inspect.getframeinfo(inspect.currentframe()).lineno):  return RTN_CRITICAL
 
         if rcloneLSL (remotePathBase, remoteListFile, excludes, linenum=inspect.getframeinfo(inspect.currentframe()).lineno):  return RTN_CRITICAL
@@ -378,7 +378,7 @@ def bidirSync():
 
 
     # ***** Sync LOCAL changes to REMOTE ***** 
-    if len(remoteDeltas) == 0 and len(localDeltas) == 0 and not firstSync:
+    if len(remoteDeltas) == 0 and len(localDeltas) == 0 and not first-sync:
         logging.info (">>>>> No changes on Local  - Skipping sync from Local to Remote")
     else:
         logging.info (">>>>> Synching Local to Remote")
@@ -487,7 +487,7 @@ if __name__ == '__main__':
     parser.add_argument('--dry-run',         help="Go thru the motions - No files are copied/deleted.  Also asserts --Verbose.", action='store_true')
     args = parser.parse_args()
 
-    firstSync    = args.first_sync
+    first-sync    = args.first_sync
     checkAccess  = args.check_access
     verbose      = args.verbose
     rcVerbose    = (args.rc_verbose if args.rc_verbose else 0)
@@ -520,7 +520,7 @@ if __name__ == '__main__':
         logging.error ("ERROR  LocalPath parameter <{}> cannot be accessed.  Path error?  Aborting".format(localPathBase)); exit()
 
 
-    if verbose or rcVerbose>0 or force or firstSync or dryRun:
+    if verbose or rcVerbose>0 or force or first-sync or dryRun:
         verbose = True
         logging.getLogger().setLevel(logging.INFO)          # Log each file transaction
     else:
@@ -530,7 +530,7 @@ if __name__ == '__main__':
     if requestLock (sys.argv) == 0:
         status = bidirSync()
         if status == RTN_CRITICAL:
-            logging.error ('***** Critical Error Abort - Must run --FirstSync to recover.  See README.md *****')
+            logging.error ('***** Critical Error Abort - Must run --first-sync to recover.  See README.md *****')
             if os.path.exists (localListFile):   subprocess.call (['mv', localListFile, localListFile + '_ERROR'])
             if os.path.exists (remoteListFile):  subprocess.call (['mv', remoteListFile, remoteListFile + '_ERROR'])
         if status == RTN_ABORT:            
