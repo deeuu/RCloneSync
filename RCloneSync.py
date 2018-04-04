@@ -104,7 +104,7 @@ def bidirSync():
 
 
     # ***** first-sync generate local and remote file lists, and copy any unique Remote files to Local ***** 
-    if first-sync:
+    if first_sync:
         logging.info (">>>>> Generating --first-sync Local and Remote lists")
         if rcloneLSL (localPathBase, localListFile, excludes, linenum=inspect.getframeinfo(inspect.currentframe()).lineno):  return RTN_CRITICAL
 
@@ -378,7 +378,7 @@ def bidirSync():
 
 
     # ***** Sync LOCAL changes to REMOTE ***** 
-    if len(remoteDeltas) == 0 and len(localDeltas) == 0 and not first-sync:
+    if len(remoteDeltas) == 0 and len(localDeltas) == 0 and not first_sync:
         logging.info (">>>>> No changes on Local  - Skipping sync from Local to Remote")
     else:
         logging.info (">>>>> Synching Local to Remote")
@@ -478,7 +478,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="***** BiDirectional Sync for Cloud Services using RClone *****")
     parser.add_argument('Cloud',            help="Name of remote cloud service ({}) plus optional path".format(clouds))
     parser.add_argument('LocalPath',        help="Path to local tree base", default=None)
-    parser.add_argument('--first-sync',      help="First run setup.  WARNING: Local files may overwrite Remote versions.  Also asserts --verbose.", action='store_true')
+    parser.add_argument('--first-sync', '-1',      help="First run setup.  WARNING: Local files may overwrite Remote versions.  Also asserts --verbose.", action='store_true')
     parser.add_argument('--check-access',    help="Ensure expected RCLONE_TEST files are found on both Local and Remote filesystems, else abort.", action='store_true')
     parser.add_argument('--force', '-f',          help="Bypass MAX_DELETE ({}%%) safety check and run the sync.  Also asserts --verbose.".format(MAX_DELETE), action='store_true')
     parser.add_argument('--exclude-list-file',help="File containing rclone file/path exclusions (Needed for Dropbox)", default=None)
@@ -487,7 +487,7 @@ if __name__ == '__main__':
     parser.add_argument('--dry-run',         help="Go thru the motions - No files are copied/deleted.  Also asserts --Verbose.", action='store_true')
     args = parser.parse_args()
 
-    first-sync    = args.first_sync
+    first_sync    = args.first_sync
     checkAccess  = args.check_access
     verbose      = args.verbose
     rcVerbose    = (args.rc_verbose if args.rc_verbose else 0)
@@ -520,7 +520,7 @@ if __name__ == '__main__':
         logging.error ("ERROR  LocalPath parameter <{}> cannot be accessed.  Path error?  Aborting".format(localPathBase)); exit()
 
 
-    if verbose or rcVerbose>0 or force or first-sync or dryRun:
+    if verbose or rcVerbose>0 or force or first_sync or dryRun:
         verbose = True
         logging.getLogger().setLevel(logging.INFO)          # Log each file transaction
     else:
