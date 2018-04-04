@@ -25,20 +25,20 @@ from datetime import datetime
 import time
 #import shlex # Not used anymore, so free the memory.
 import logging # For terminal process messages.
-import inspect                                      # for getting the line number for error messages
-import collections                                  # dictionary sorting 
+import inspect # For getting the line number for error messages
+import collections # Dictionary sorting 
 
 __VERSION__ = '180404'
 
 # Configurations.
-LOCAL_WD = os.path.expanduser("~/.RCloneSyncWD/")    # File lists for the local and remote trees as of last sync, etc.
+LOCAL_WD = os.path.expanduser("~/.RCloneSyncWD/") # File lists for the local and remote trees as of last sync, etc.
 if not os.path.exists(LOCAL_WD):
     os.makedirs(LOCAL_WD)
 
 MAX_DELETE = 50 # Deleted allowed, else abort.  Use --Force to override.
 
 
-logging.basicConfig(format='%(asctime)s/:  %(message)s')   # /%(levelname)s/%(module)s/%(funcName)s
+logging.basicConfig(format='%(asctime)s/:  %(message)s') # /%(levelname)s/%(module)s/%(funcName)s
 
 localListFile = remoteListFile = "" # On critical error, these files are deleted, requiring a --first-sync to recover.
 RTN_ABORT = 1 # Tokens for return codes based on criticality.
@@ -61,17 +61,17 @@ def bidirSync():
         excludes.append("--exclude-from")
         excludes.append(exclusions)
 
-    listFileBase  = LOCAL_WD + remotePathBase.replace(':','_').replace(r'/','_')    # '/home/<user>/.RCloneSyncWD/Remote__some_path_' or '/home/<user>/.RCloneSyncWD/Remote_'
+    listFileBase  = LOCAL_WD + remotePathBase.replace(':','_').replace(r'/','_') # '/home/<user>/.RCloneSyncWD/Remote__some_path_' or '/home/<user>/.RCloneSyncWD/Remote_'
 
-    localListFile  = listFileBase + '_llocalLSL'    # '/home/<user>/.RCloneSyncWD/Remote__some_path_llocalLSL'  (extra 'l' to make the dir list pretty)
-    remoteListFile = listFileBase + '_remoteLSL'    # '/home/<user>/.RCloneSyncWD/Remote__some_path_remoteLSL'
+    localListFile  = listFileBase + '_llocalLSL' # '/home/<user>/.RCloneSyncWD/Remote__some_path_llocalLSL'  (extra 'l' to make the dir list pretty)
+    remoteListFile = listFileBase + '_remoteLSL' # '/home/<user>/.RCloneSyncWD/Remote__some_path_remoteLSL'
 
     switches = []
     for x in range(rcVerbose):
         switches.append("-v")
     if dryRun:
         switches.append("--dry-run")
-        if os.path.exists (localListFile):          # If dryrun, origianl LSL files are preserved and lsl's are done to the _DRYRUN files
+        if os.path.exists (localListFile): # If dryrun, origianl LSL files are preserved and lsl's are done to the _DRYRUN files
             subprocess.call (['cp', localListFile, localListFile + '_DRYRUN'])
             localListFile  += '_DRYRUN'
         if os.path.exists (remoteListFile):
@@ -159,7 +159,7 @@ def bidirSync():
                 if key not in remoteCheck:
                     logging.error (printMsg ("ERROR", "Failed access health test:  Local key <{}> not found in remote".format(key), "")); return RTN_CRITICAL
 
-        os.remove(localChkListFile)         # _*ChkLSL files will be left if the check fails.  Look at these files for clues.
+        os.remove(localChkListFile) # _*ChkLSL files will be left if the check fails.  Look at these files for clues.
         os.remove(remoteChkListFile)
 
 
@@ -174,7 +174,7 @@ def bidirSync():
 
 
     # ***** Load Current and Prior listings of both Local and Remote trees *****
-    status, localPrior =   loadList (localListFile)                    # Successful load of the file return status = 0
+    status, localPrior =   loadList (localListFile) # Successful load of the file return status = 0
     if status:                  logging.error (printMsg ("ERROR", "Failed loading prior local list file <{}>".format(localListFile))); return RTN_CRITICAL
     if len(localPrior) == 0:    logging.error (printMsg ("ERROR", "Zero length in prior local list file <{}>".format(localListFile))); return RTN_CRITICAL
 
@@ -206,7 +206,7 @@ def bidirSync():
                 if localPrior[key]['datetime'] < localNow[key]['datetime']:
                     logging.info (printMsg ("LOCAL", "  File is newer", key))
                     _newer=True
-                else:               # Now local version is older than prior sync
+                else: # Now local version is older than prior sync
                     logging.info (printMsg ("LOCAL", "  File is OLDER", key))
                     _older=True
             if localPrior[key]['size'] != localNow[key]['size']:
@@ -221,7 +221,7 @@ def bidirSync():
             logging.info (printMsg ("LOCAL", "  File is new", key))
             localDeltas[key] = {'new':True, 'newer':False, 'older':False, 'size':False, 'deleted':False}
 
-    localDeltas = collections.OrderedDict(sorted(localDeltas.items()))      # sort the deltas list
+    localDeltas = collections.OrderedDict(sorted(localDeltas.items())) # sort the deltas list
     if len(localDeltas) > 0:
         news = newers = olders = deletes = 0
         for key in localDeltas:
@@ -247,7 +247,7 @@ def bidirSync():
                 if remotePrior[key]['datetime'] < remoteNow[key]['datetime']:
                     logging.info (printMsg ("REMOTE", "  File is newer", key))
                     _newer=True
-                else:               # Current remote version is older than prior sync 
+                else: # Current remote version is older than prior sync 
                     logging.info (printMsg ("REMOTE", "  File is OLDER", key))
                     _older=True
             if remotePrior[key]['size'] != remoteNow[key]['size']:
@@ -262,7 +262,7 @@ def bidirSync():
             logging.info (printMsg ("REMOTE", "  File is new", key))
             remoteDeltas[key] = {'new':True, 'newer':False, 'older':False, 'size':False, 'deleted':False}
 
-    remoteDeltas = collections.OrderedDict(sorted(remoteDeltas.items()))    # sort the deltas list
+    remoteDeltas = collections.OrderedDict(sorted(remoteDeltas.items())) # sort the deltas list
     if len(remoteDeltas) > 0:
         news = newers = olders = deletes = 0
         for key in remoteDeltas:
@@ -280,7 +280,7 @@ def bidirSync():
                        .format (MAX_DELETE, localDeleted, len(localPrior), localPathBase))
         tooManyLocalDeletes = True
 
-    tooManyRemoteDeletes = False    # Local error message placed here so that it is at the end of the listed changes for both
+    tooManyRemoteDeletes = False # Local error message placed here so that it is at the end of the listed changes for both
     if not force and float(remoteDeleted)/len(remotePrior) > float(MAX_DELETE)/100:
         logging.error ("Excessive number of deletes (>{}%, {} of {}) found on the Remote system {} - Aborting.  Run with --Force if desired."
                        .format (MAX_DELETE, remoteDeleted, len(remotePrior), remotePathBase))
@@ -428,10 +428,10 @@ def loadList (infile):
                 else:
                     logging.warning ("Something wrong with this line (ignored) in {}:\n   <{}>".format(infile, line))
 
-        return 0, collections.OrderedDict(sorted(d.items()))        # return Success and a sorted list
+        return 0, collections.OrderedDict(sorted(d.items())) # return Success and a sorted list
     except:
         logging.error ("Exception in loadList loading <{}>:  <{}>".format(infile, sys.exc_info()))
-        return 1, ""                                                # return False
+        return 1, "" # return False
 
 
 LOCK_FILE = "/tmp/RCloneSync_LOCK"
@@ -440,7 +440,7 @@ def requestLock (caller):
         if os.path.exists(LOCK_FILE):
             with open(LOCK_FILE) as fd:
                 lockedBy = fd.read()
-                logging.debug ("{}.  Waiting a sec.".format(lockedBy[:-1]))   # remove the \n
+                logging.debug ("{}.  Waiting a sec.".format(lockedBy[:-1])) # remove the \n
             time.sleep (1)
         else:  
             with open(LOCK_FILE, 'w') as fd:
@@ -492,13 +492,13 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--force',
         help="Bypass MAX_DELETE ({}%%) safety check and run the sync.  Also asserts --verbose.".format(MAX_DELETE),
         action='store_true')
-    parser.add_argument('--exclude-list-file',
+    parser.add_argument('-e', '--exclude-list-file',
         help="File containing rclone file/path exclusions (Needed for Dropbox)",
         default=None)
     parser.add_argument('-V', '--verbose',
         help="Enable event logging with per-file details", action='store_true')
     parser.add_argument('--rc-verbose',
-        help="Enable rclone's verbosity levels (May be specified more than once for more details.  Also asserts --Verbose.)",
+        help="Enable rclone's verbosity levels (May be specified more than once for more details. Also asserts --verbose.)",
         action='count')
     parser.add_argument('--dry-run',
         help="Go thru the motions - No files are copied/deleted. Also asserts --verbose.",
@@ -516,7 +516,7 @@ if __name__ == '__main__':
     dryRun       = args.dry_run
     force        = args.force
 
-    remoteFormat = re.compile('([\w-]+):(.*)')              # Handle variations in the Cloud argument -- Remote: or Remote:some/path or Remote:/some/path
+    remoteFormat = re.compile('([\w-]+):(.*)') # Handle variations in the Cloud argument -- Remote: or Remote:some/path or Remote:/some/path
     out = remoteFormat.match(args.Cloud)
     remoteName = remotePathPart = remotePathBase = ''
     if out:
@@ -526,16 +526,16 @@ if __name__ == '__main__':
         remotePathPart = out.group(2)
         if remotePathPart != '':
             if remotePathPart[0] != '/':
-                remotePathPart = '/' + remotePathPart       # For consistency ensure the path part starts and ends with /'s
+                remotePathPart = '/' + remotePathPart # For consistency ensure the path part starts and ends with /'s
             if remotePathPart[-1] != '/':
                 remotePathPart += '/'
-        remotePathBase = remoteName + remotePathPart        # 'Remote:' or 'Remote:/some/path/'
+        remotePathBase = remoteName + remotePathPart # 'Remote:' or 'Remote:/some/path/'
     else:
         logging.error ("ERROR  Cloud parameter <{}> cannot be parsed. ':' missing?  Configured remotes: {}".format(args.Cloud, clouds)); exit()
 
 
     localPathBase = args.LocalPath
-    if localPathBase[-1] != '/':                            # For consistency ensure the path ends with /
+    if localPathBase[-1] != '/': # For consistency ensure the path ends with /
         localPathBase += '/'                                
     if not os.path.exists(localPathBase):
         logging.error ("ERROR  LocalPath parameter <{}> cannot be accessed.  Path error?  Aborting".format(localPathBase)); exit()
@@ -543,9 +543,9 @@ if __name__ == '__main__':
 
     if verbose or rcVerbose>0 or force or first_sync or dryRun:
         verbose = True
-        logging.getLogger().setLevel(logging.INFO)          # Log each file transaction
+        logging.getLogger().setLevel(logging.INFO) # Log each file transaction
     else:
-        logging.getLogger().setLevel(logging.WARNING)       # Log only unusual events
+        logging.getLogger().setLevel(logging.WARNING) # Log only unusual events
 
 
     if requestLock (sys.argv) == 0:
