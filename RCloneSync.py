@@ -28,6 +28,7 @@ import logging # For terminal process messages.
 import inspect                                      # for getting the line number for error messages
 import collections                                  # dictionary sorting 
 
+__VERSION__ = '180404'
 
 # Configurations.
 LOCAL_WD = os.path.expanduser("~/.RCloneSyncWD/")    # File lists for the local and remote trees as of last sync, etc.
@@ -475,16 +476,36 @@ if __name__ == '__main__':
         logging.error ("ERROR  rclone not installed?\nError message: {}\n".format(sys.exc_info()[1])); exit()
     clouds = [c.decode('utf-8') for c in clouds.split()] # Py3 create a byte array instead a string list.
 
-    parser = argparse.ArgumentParser(description="***** BiDirectional Sync for Cloud Services using RClone *****")
-    parser.add_argument('Cloud',            help="Name of remote cloud service ({}) plus optional path".format(clouds))
-    parser.add_argument('LocalPath',        help="Path to local tree base", default=None)
+    parser = argparse.ArgumentParser(description="BiDirectional Sync for Cloud Services using RClone.")
+    parser.add_argument('-v', '--version',
+        action='version',
+        version='RCloneSyn python2/3 script v.' + __VERSION__)
+    parser.add_argument('Cloud',
+        help="Name of remote cloud service ({}) plus optional path".format(clouds))
+    parser.add_argument('LocalPath',
+        help="Path to local tree base",
+        default=None)
     parser.add_argument('--first-sync', '-1',      help="First run setup.  WARNING: Local files may overwrite Remote versions.  Also asserts --verbose.", action='store_true')
-    parser.add_argument('--check-access',    help="Ensure expected RCLONE_TEST files are found on both Local and Remote filesystems, else abort.", action='store_true')
-    parser.add_argument('--force', '-f',          help="Bypass MAX_DELETE ({}%%) safety check and run the sync.  Also asserts --verbose.".format(MAX_DELETE), action='store_true')
-    parser.add_argument('--exclude-list-file',help="File containing rclone file/path exclusions (Needed for Dropbox)", default=None)
-    parser.add_argument('--verbose', '-v',        help="Enable event logging with per-file details", action='store_true')
-    parser.add_argument('--rc-verbose',      help="Enable rclone's verbosity levels (May be specified more than once for more details.  Also asserts --Verbose.)", action='count')
-    parser.add_argument('--dry-run',         help="Go thru the motions - No files are copied/deleted.  Also asserts --Verbose.", action='store_true')
+    parser.add_argument('--check-access',
+        help="Ensure expected RCLONE_TEST files are found on both Local and Remote filesystems, else abort.",
+        action='store_true')
+    parser.add_argument('-f', '--force',
+        help="Bypass MAX_DELETE ({}%%) safety check and run the sync.  Also asserts --verbose.".format(MAX_DELETE),
+        action='store_true')
+    parser.add_argument('--exclude-list-file',
+        help="File containing rclone file/path exclusions (Needed for Dropbox)",
+        default=None)
+    parser.add_argument('-V', '--verbose',
+        help="Enable event logging with per-file details", action='store_true')
+    parser.add_argument('--rc-verbose',
+        help="Enable rclone's verbosity levels (May be specified more than once for more details.  Also asserts --Verbose.)",
+        action='count')
+    parser.add_argument('--dry-run',
+        help="Go thru the motions - No files are copied/deleted. Also asserts --verbose.",
+        action='store_true')
+    parser.add_argument('--cron',
+        help="Add the correspondent syncronization to the cron tab.",
+        default=5)
     args = parser.parse_args()
 
     first_sync    = args.first_sync
