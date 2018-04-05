@@ -152,7 +152,7 @@ def bidirSync():
 
 		if len(localCheck) < 1 or len(localCheck) != len(remoteCheck):
 			logging.error(printMsg("ERROR", "Failed access health test:  <{}> local count {}, remote count {}"
-									 .format(chkFile, len(localCheck), len(remoteCheck)), "")); return RTN_CRITICAL
+									.format(chkFile, len(localCheck), len(remoteCheck)), "")); return RTN_CRITICAL
 		else:
 			for key in localCheck:
 				logging.debug("Check key <{}>".format(key))
@@ -174,21 +174,21 @@ def bidirSync():
 
 
 	# ***** Load Current and Prior listings of both Local and Remote trees *****
-	status, localPrior =   loadList(localListFile) # Successful load of the file return status = 0
-	if status:				  logging.error(printMsg("ERROR", "Failed loading prior local list file <{}>".format(localListFile))); return RTN_CRITICAL
+	status, localPrior = loadList(localListFile) # Successful load of the file return status = 0
+	if status:					logging.error(printMsg("ERROR", "Failed loading prior local list file <{}>".format(localListFile))); return RTN_CRITICAL
 	if len(localPrior) == 0:	logging.error(printMsg("ERROR", "Zero length in prior local list file <{}>".format(localListFile))); return RTN_CRITICAL
 
-	status, remotePrior =  loadList(remoteListFile)
-	if status:				  logging.error(printMsg("ERROR", "Failed loading prior remote list file <{}>".format(remoteListFile))); return RTN_CRITICAL
-	if len(remotePrior) == 0:   logging.error(printMsg("ERROR", "Zero length in prior remote list file <{}>".format(remoteListFile))); return RTN_CRITICAL
+	status, remotePrior = loadList(remoteListFile)
+	if status:					logging.error(printMsg("ERROR", "Failed loading prior remote list file <{}>".format(remoteListFile))); return RTN_CRITICAL
+	if len(remotePrior) == 0:	logging.error(printMsg("ERROR", "Zero length in prior remote list file <{}>".format(remoteListFile))); return RTN_CRITICAL
 
-	status, localNow =	 loadList(localListFileNew)
-	if status:				  logging.error(printMsg("ERROR", "Failed loading current local list file <{}>".format(localListFileNew))); return RTN_ABORT
-	if len(localNow) == 0:	  logging.error(printMsg("ERROR", "Zero length in current local list file <{}>".format(localListFileNew))); return RTN_ABORT
+	status, localNow = loadList(localListFileNew)
+	if status:					logging.error(printMsg("ERROR", "Failed loading current local list file <{}>".format(localListFileNew))); return RTN_ABORT
+	if len(localNow) == 0:		logging.error(printMsg("ERROR", "Zero length in current local list file <{}>".format(localListFileNew))); return RTN_ABORT
 
 	status, remoteNow =	loadList(remoteListFileNew)
-	if status:				  logging.error(printMsg("ERROR", "Failed loading current remote list file <{}>".format(remoteListFileNew))); return RTN_ABORT
-	if len(remoteNow) == 0:	 logging.error(printMsg("ERROR", "Zero length in current remote list file <{}>".format(remoteListFileNew))); return RTN_ABORT
+	if status:					logging.error(printMsg("ERROR", "Failed loading current remote list file <{}>".format(remoteListFileNew))); return RTN_ABORT
+	if len(remoteNow) == 0:		logging.error(printMsg("ERROR", "Zero length in current remote list file <{}>".format(remoteListFileNew))); return RTN_ABORT
 
 
 	# ***** Check for LOCAL deltas relative to the prior sync
@@ -200,7 +200,7 @@ def bidirSync():
 		if key not in localNow:
 			logging.info(printMsg("LOCAL", "  File was deleted", key))
 			localDeleted += 1
-			_deleted=True			
+			_deleted=True
 		else:
 			if localPrior[key]['datetime'] != localNow[key]['datetime']:
 				if localPrior[key]['datetime'] < localNow[key]['datetime']:
@@ -225,10 +225,10 @@ def bidirSync():
 	if len(localDeltas) > 0:
 		news = newers = olders = deletes = 0
 		for key in localDeltas:
-			if localDeltas[key]['new']:	  news += 1
-			if localDeltas[key]['newer']:	newers += 1
-			if localDeltas[key]['older']:	olders += 1
-			if localDeltas[key]['deleted']:  deletes += 1
+			if localDeltas[key]['new']:			news += 1
+			if localDeltas[key]['newer']:		newers += 1
+			if localDeltas[key]['older']:		olders += 1
+			if localDeltas[key]['deleted']:		deletes += 1
 		logging.warning("  {:4} file change(s) on LOCAL:  {:4} new, {:4} newer, {:4} older, {:4} deleted".format(len(localDeltas), news, newers, olders, deletes))
 
 
@@ -241,7 +241,7 @@ def bidirSync():
 		if key not in remoteNow:
 			logging.info(printMsg("REMOTE", "  File was deleted", key))
 			remoteDeleted += 1
-			_deleted=True			
+			_deleted=True
 		else:
 			if remotePrior[key]['datetime'] != remoteNow[key]['datetime']:
 				if remotePrior[key]['datetime'] < remoteNow[key]['datetime']:
@@ -266,10 +266,10 @@ def bidirSync():
 	if len(remoteDeltas) > 0:
 		news = newers = olders = deletes = 0
 		for key in remoteDeltas:
-			if remoteDeltas[key]['new']:	  news += 1
-			if remoteDeltas[key]['newer']:	newers += 1
-			if remoteDeltas[key]['older']:	olders += 1
-			if remoteDeltas[key]['deleted']:  deletes += 1
+			if remoteDeltas[key]['new']:		news += 1
+			if remoteDeltas[key]['newer']:		newers += 1
+			if remoteDeltas[key]['older']:		olders += 1
+			if remoteDeltas[key]['deleted']:	deletes += 1
 		logging.warning("  {:4} file change(s) on REMOTE: {:4} new, {:4} newer, {:4} older, {:4} deleted".format(len(remoteDeltas), news, newers, olders, deletes))
 
 
@@ -283,7 +283,7 @@ def bidirSync():
 	tooManyRemoteDeletes = False # Local error message placed here so that it is at the end of the listed changes for both
 	if not force and float(remoteDeleted)/len(remotePrior) > float(MAX_DELETE)/100:
 		logging.error("Excessive number of deletes (>{}%, {} of {}) found on the Remote system {} - Aborting.  Run with --Force if desired."
-					   .format(MAX_DELETE, remoteDeleted, len(remotePrior), remotePathBase))
+						.format(MAX_DELETE, remoteDeleted, len(remotePrior), remotePathBase))
 		tooManyRemoteDeletes = True
 
 	if tooManyLocalDeletes or tooManyRemoteDeletes: return RTN_ABORT
@@ -410,7 +410,7 @@ def loadList(infile):
 	# Format ex:
 	#  3009805 2013-09-16 04:13:50.000000000 12 - Wait.mp3
 	#   541087 2017-06-19 21:23:28.610000000 DSC02478.JPG
-	#	size  <----- datetime (epoch) ----> key
+	#   size  <----- datetime (epoch) ----> key
 
 	d = {}
 	try:
@@ -512,13 +512,13 @@ if __name__ == '__main__':
 		default=5)
 	args = parser.parse_args()
 
-	first_sync	= args.first_sync
-	checkAccess  = args.check_access
-	verbose	  = args.verbose
-	rcVerbose	= (args.rc_verbose if args.rc_verbose else 0)
-	exclusions   = args.exclude_list_file
-	dryRun	   = args.dry_run
-	force		= args.force
+	first_sync = args.first_sync
+	checkAccess = args.check_access
+	verbose = args.verbose
+	rcVerbose = (args.rc_verbose if args.rc_verbose else 0)
+	exclusions = args.exclude_list_file
+	dryRun = args.dry_run
+	force = args.force
 
 	remoteFormat = re.compile('([\w-]+):(.*)') # Handle variations in the Cloud argument -- Remote: or Remote:some/path or Remote:/some/path
 	out = remoteFormat.match(args.Cloud)
@@ -540,7 +540,7 @@ if __name__ == '__main__':
 
 	localPathBase = args.LocalPath
 	if localPathBase[-1] != '/': # For consistency ensure the path ends with /
-		localPathBase += '/'								
+		localPathBase += '/'
 	if not os.path.exists(localPathBase):
 		logging.error("ERROR  LocalPath parameter <{}> cannot be accessed.  Path error?  Aborting".format(localPathBase)); exit()
 
@@ -558,7 +558,7 @@ if __name__ == '__main__':
 			logging.error('***** Critical Error Abort - Must run --first-sync to recover.  See README.md *****')
 			if os.path.exists(localListFile):   subprocess.call(['mv', localListFile, localListFile + '_ERROR'])
 			if os.path.exists(remoteListFile):  subprocess.call(['mv', remoteListFile, remoteListFile + '_ERROR'])
-		if status == RTN_ABORT:			
+		if status == RTN_ABORT:
 			logging.error('***** Error abort.  Try running RCloneSync again. *****')
 		releaseLock(sys.argv)
 	else:  logging.warning("Prior lock file in place.  Aborting.")
