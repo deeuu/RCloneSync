@@ -51,7 +51,7 @@ def bidirSync():
 	global localListFile, remoteListFile
 
 	def printMsg(locale, msg, key=''):
-		return "  {:9}{:35} - {}".format(locale, msg, key)
+		return "{:9}{:35} - {}".format(locale, msg, key)
 
 	excludes = []
 	if exclusions:
@@ -121,7 +121,7 @@ def bidirSync():
 			if key not in localNow:
 				src = remotePathBase + key
 				dest = localPathBase + key
-				logging.info(printMsg("REMOTE", " Copying to local", dest))
+				logging.info(printMsg("REMOTE", "Copying to local", dest))
 				if rcloneCmd('copyto', src, dest, switches, linenum=inspect.getframeinfo(inspect.currentframe()).lineno): return RTN_CRITICAL
 
 		if rcloneLSL(localPathBase, localListFile, excludes, linenum=inspect.getframeinfo(inspect.currentframe()).lineno): return RTN_CRITICAL
@@ -509,7 +509,7 @@ if __name__ == '__main__':
 	parser.add_argument('--cron',
 		help="Add the correspondent syncronization to the cron tab.",
 		type=int,
-		default=5)
+		default=None)
 	args = parser.parse_args()
 
 	first_sync = args.first_sync
@@ -545,6 +545,17 @@ if __name__ == '__main__':
 		logging.error("ERROR LocalPath parameter <{}> cannot be accessed. Path error? Aborting".format(localPathBase)); exit()
 
 
+	if args.cron: # Add the correspondent execution to crontab.
+		if sys.version_info<(3,0):
+			cmd ="crontab -l */t * * * * python3 '{f}' 'remotePathBase' 'localPathBase'"
+		else:
+			cmd ="crontab -l */t * * * * python '{f}' 'remotePathBase' 'localPathBase'"
+		cmd = cmd.format(
+					t=args.cron,
+					f=os.path.realpath(__file__),
+				)
+		os.system(cmd)
+
 	if verbose or rcVerbose>0 or force or first_sync or dryRun:
 		verbose = True
 		logging.getLogger().setLevel(logging.INFO) # Log each file transaction
@@ -562,4 +573,4 @@ if __name__ == '__main__':
 			logging.error('***** Error abort. Try running RCloneSync again. *****')
 		releaseLock(sys.argv)
 	else: logging.warning("Prior lock file in place. Aborting.")
-	logging.warning(">>>>> All done.\n\n")
+	logging.warning(">>>>> All done.")
