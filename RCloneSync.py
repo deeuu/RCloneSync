@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #========================================================= 
 #
-# Basic BiDirectional Sync using RClone 
+# Basic BiDirectional Sync using RClone
 #
 # Usage
 # Configure rclone, including authentication before using this tool `rclone` must be in the search path.
@@ -276,13 +276,13 @@ def bidirSync():
 	# ***** Check for too many deleted files - possible error condition and don't want to start deleting on the other side !!!
 	tooManyLocalDeletes = False
 	if not force and float(localDeleted)/len(localPrior) > float(MAX_DELETE)/100:
-		logging.error("Excessive number of deletes (>{}%, {} of {}) found on the Local system {} - Aborting. Run with --Force if desired."
+		logging.error("Excessive number of deletes (>{}%, {} of {}) found on the Local system {} - Aborting. Run with --force if desired."
 						.format(MAX_DELETE, localDeleted, len(localPrior), localPathBase))
 		tooManyLocalDeletes = True
 
 	tooManyRemoteDeletes = False # Local error message placed here so that it is at the end of the listed changes for both
 	if not force and float(remoteDeleted)/len(remotePrior) > float(MAX_DELETE)/100:
-		logging.error("Excessive number of deletes (>{}%, {} of {}) found on the Remote system {} - Aborting. Run with --Force if desired."
+		logging.error("Excessive number of deletes (>{}%, {} of {}) found on the Remote system {} - Aborting. Run with --force if desired."
 						.format(MAX_DELETE, remoteDeleted, len(remotePrior), remotePathBase))
 		tooManyRemoteDeletes = True
 
