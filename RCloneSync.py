@@ -61,17 +61,17 @@ def bidirSync():
 		excludes.append("--exclude-from")
 		excludes.append(exclusions)
 
-	listFileBase = LOCAL_WD + remotePathBase.replace(':','_').replace(r'/','_') # '/home/<user>/.RCloneSyncWD/Remote__some_path_' or '/home/<user>/.RCloneSyncWD/Remote_'
+	listFileBase = LOCAL_WD + remotePathBase.replace(':','_').replace(r'/','_') # '/home/<user>/.RCloneSyncWD/Remote__some_path_' or '/home/<user>/.RCloneSyncWD/Remote_'.
 
-	localListFile = listFileBase + '_llocalLSL' # '/home/<user>/.RCloneSyncWD/Remote__some_path_llocalLSL' (extra 'l' to make the dir list pretty)
-	remoteListFile = listFileBase + '_remoteLSL' # '/home/<user>/.RCloneSyncWD/Remote__some_path_remoteLSL'
+	localListFile = listFileBase + '_llocalLSL' # '/home/<user>/.RCloneSyncWD/Remote__some_path_llocalLSL' (extra 'l' to make the dir list pretty).
+	remoteListFile = listFileBase + '_remoteLSL' # '/home/<user>/.RCloneSyncWD/Remote__some_path_remoteLSL'.
 
 	switches = []
 	for x in range(rcVerbose):
 		switches.append("-v")
 	if dryRun:
 		switches.append("--dry-run")
-		if os.path.exists(localListFile): # If dryrun, origianl LSL files are preserved and lsl's are done to the _DRYRUN files
+		if os.path.exists(localListFile): # If dryrun, origianl LSL files are preserved and lsl's are done to the _DRYRUN files.
 			subprocess.call(['cp', localListFile, localListFile + '_DRYRUN'])
 			localListFile += '_DRYRUN'
 		if os.path.exists(remoteListFile):
