@@ -55,6 +55,8 @@ optional arguments:
   --dry-run             Go thru the motions - No files are copied/deleted.
                         Also asserts --verbose.
   --cron CRON           Add the correspondent syncronization to the cron tab.
+  -n, --no-local-delete
+                        Don't delete any local files.
 ```	
 
 Typical run log:
