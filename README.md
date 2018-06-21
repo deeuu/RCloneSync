@@ -1,7 +1,7 @@
 # RCloneSync
 
 
-Python 2.7 cloud sync utility using rclone
+Python 2.7 / 3+ loud sync utility using rclone
 
 [Rclone](https://rclone.org/) provides a programmatic building block interface for transferring files between a cloud service 
 provider and your local filesystem (actually a lot of functionality), but rclone does not provide a turnkey bidirectional 
@@ -23,37 +23,38 @@ RCloneSync was developed and debugged for Google Drive and Dropbox (not tested o
 
 
 ```
-xxx@xxx RCloneSyncWD]$ ./RCloneSync.py -h
-2017-11-19 20:13:58,282/:  ***** BiDirectional Sync for Cloud Services using RClone *****
-usage: RCloneSync.py [-h] [--FirstSync] [--CheckAccess] [--Force]
-                     [--ExcludeListFile EXCLUDELISTFILE] [--Verbose]
-                     [--rcVerbose] [--DryRun]
+RCloneSync.py [-h] [-v] [-1] [--check-access] [-f]
+                     [-e EXCLUDE_LIST_FILE] [-V] [--rc-verbose] [--dry-run]
+                     [--cron CRON]
                      Cloud LocalPath
 
-***** BiDirectional Sync for Cloud Services using RClone *****
+BiDirectional Sync for Cloud Services using RClone.
 
 positional arguments:
-  Cloud                 Name of remote cloud service (['Dropbox:', 'GDrive:'])
+  Cloud                 Name of remote cloud service (['DropBox:', 'Gdrive:',
+                        'Gdrive-LCEE:', 'Gdrive-UNESP:', 'Gdrive-UNICAMP:'])
                         plus optional path
   LocalPath             Path to local tree base
 
 optional arguments:
   -h, --help            show this help message and exit
-  --FirstSync           First run setup. WARNING: Local files may overwrite
-                        Remote versions. Also asserts --Verbose.
-  --CheckAccess         Ensure expected RCLONE_TEST files are found on both
+  -v, --version         show program's version number and exit
+  -1, --first-sync      First run setup. WARNING: Local files may overwrite
+                        Remote versions. Also asserts --verbose.
+  --check-access        Ensure expected RCLONE_TEST files are found on both
                         Local and Remote filesystems, else abort.
-  --Force               Bypass maxDelta (50%) safety check and run the sync.
-                        Also asserts --Verbose.
-  --ExcludeListFile EXCLUDELISTFILE
+  -f, --force           Bypass MAX_DELETE (10%) safety check and run the sync.
+                        Also asserts --verbose.
+  -e EXCLUDE_LIST_FILE, --exclude-list-file EXCLUDE_LIST_FILE
                         File containing rclone file/path exclusions (Needed
                         for Dropbox)
-  --Verbose             Enable event logging with per-file details
-  --rcVerbose           Enable rclone's verbosity levels (May be specified
+  -V, --verbose         Enable event logging with per-file details
+  --rc-verbose          Enable rclone's verbosity levels (May be specified
                         more than once for more details. Also asserts
-                        --Verbose.)
-  --DryRun              Go thru the motions - No files are copied/deleted.
-                        Also asserts --Verbose.
+                        --verbose.)
+  --dry-run             Go thru the motions - No files are copied/deleted.
+                        Also asserts --verbose.
+  --cron CRON           Add the correspondent syncronization to the cron tab.
 ```	
 
 Typical run log:
