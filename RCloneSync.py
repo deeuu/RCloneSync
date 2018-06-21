@@ -389,8 +389,9 @@ def bidirSync():
 		logging.info(">>>>> rmdirs Remote")
 		if rcloneCmd('rmdirs', remotePathBase, None, switches, linenum=inspect.getframeinfo(inspect.currentframe()).lineno): return RTN_CRITICAL
 
-		logging.info(">>>>> rmdirs Local")
-		if rcloneCmd('rmdirs', localPathBase, None, switches, linenum=inspect.getframeinfo(inspect.currentframe()).lineno): return RTN_CRITICAL
+		if not no_local_delete:
+			logging.info(">>>>> rmdirs Local")
+			if rcloneCmd('rmdirs', localPathBase, None, switches, linenum=inspect.getframeinfo(inspect.currentframe()).lineno): return RTN_CRITICAL
 
 
 	# ***** Clean up *****
@@ -510,11 +511,15 @@ if __name__ == '__main__':
 		help="Add the correspondent syncronization to the cron tab.",
 		type=int,
 		default=None)
+	parser.add_argument('-n', '--no-local-delete',
+		help="Don't delete any local files",
+		action='store_true')
 	args = parser.parse_args()
 
 	first_sync = args.first_sync
 	checkAccess = args.check_access
 	verbose = args.verbose
+	no_local_delete = args.no_local_delete
 	rcVerbose = (args.rc_verbose if args.rc_verbose else 0)
 	exclusions = args.exclude_list_file
 	dryRun = args.dry_run
