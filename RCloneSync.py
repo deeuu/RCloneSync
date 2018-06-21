@@ -512,7 +512,7 @@ if __name__ == '__main__':
 		type=int,
 		default=None)
 	parser.add_argument('-n', '--no-local-delete',
-		help="Don't delete any local files",
+		help="Don't delete any local files.",
 		action='store_true')
 	args = parser.parse_args()
 
